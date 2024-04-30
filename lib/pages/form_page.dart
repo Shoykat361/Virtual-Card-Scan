@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtual_card/models/contact_model.dart';
 
 class FormPage extends StatefulWidget {
   static const String routeName = '/form';
@@ -174,8 +175,20 @@ class _FormPageState extends State<FormPage> {
     );
   }
 
-  void _saveContact() {
+  void _saveContact() async{
     if(formKey.currentState!.validate()){
+      final contact = ContactModel(
+        name: nameController.text,
+        mobile: mobileController.text,
+        email: emailController.text,
+        company: companyController.text,
+        designation: designationController.text,
+        address: addresController.text,
+        webSite: webSiteController.text,
+
+
+
+      );
 
     }
   }
