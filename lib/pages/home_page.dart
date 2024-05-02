@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:virtual_card/models/contact_model.dart';
+import 'package:virtual_card/pages/contact_details_page.dart';
 import 'package:virtual_card/pages/form_page.dart';
 import 'package:virtual_card/providers/contact_provider.dart';
+import 'package:virtual_card/utils/helpers.dart';
 class HomePage extends StatefulWidget {
   static const String routeName = '/';
   const HomePage({super.key});
@@ -76,12 +79,30 @@ class _HomePageState extends State<HomePage> {
             itemCount: provider.contactList.length,
               itemBuilder: (context, index) {
               final contact = provider.contactList[index];
-              return ListTile(
-                title: Text(contact.name),
-                trailing: IconButton(onPressed: () {
-
+              return Dismissible(
+                key: UniqueKey(),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  padding: const EdgeInsets.only(right: 30),
+                  alignment: FractionalOffset.centerRight,
+                  color: Colors.redAccent,
+                  child: const Icon(Icons.delete,color: Colors.white,),
+                ),
+                confirmDismiss: _showConfirmedDismiss,
+                onDismissed: (direction) async {
+                 await provider.deleteContact(contact.id);
+                 showMsg(context, 'Deleted ');
                 },
-                icon: Icon(contact.favorite?Icons.favorite :Icons.favorite_border),),
+                child: ListTile(
+                  onTap: ()=> Navigator.pushNamed(context, ContactDetailsPage.routeName,arguments: contact.id),
+                  title: Text(contact.name),
+                  trailing: IconButton(onPressed: () {
+                    //contact.favorite = !contact.favorite;
+                    provider.updateContactField(contact,tblContactColFavorite);
+
+                  },
+                  icon:Icon(contact.favorite?Icons.favorite :Icons.favorite_border),),
+                ),
               );
 
               },
@@ -90,6 +111,29 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  Future<bool?> _showConfirmedDismiss(DismissDirection direction) {
+    return showDialog(context: context, builder: (context)=>AlertDialog(
+      title: const Text('Delete The Contact'),
+      icon: const Icon(Icons.delete,color: Colors.blueAccent,),
+      content: const Text('Are you Sure Delete This'),
+      actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context, false);
+            },
+            child: Text('No'),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            child: Text('Yes'),
+          ),
+        ],
+
+    ),);
   }
 }
 
